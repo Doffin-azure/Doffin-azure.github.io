@@ -1,3 +1,10 @@
+---
+title: "Survival Analysis"
+date: 2025-04-17
+categories: [Statistics, Survival Analysis,Big Data]
+tags: [Survival Analysis, Statistics, Data Science,Spark]
+---
+
 这是一份关于[Survival Analysis for Churn and Lifetime Value | Databricks](https://www.databricks.com/solutions/accelerators/survival-analysis-for-churn-and-lifetime-value)的利用spark的复现报告。
 
 ## 01 初始设置
@@ -77,7 +84,7 @@ _ = spark.sql('''
 ```
 
 完成数据写入到数据库后，使用show()方法，你应当能检查到正常写入的数据库结果。
-![Image](..\assets\post_figure\Pasted image 20250414185632.png)![Image](..\assets\post_figure\Pasted image 20250414185644.png)
+![Image](assets\post_figure\Pasted image 20250414185632.png)![Image](assets\post_figure\Pasted image 20250414185644.png)
 下面开始正式的生存分析
 
 生存分析是一组统计方法，用于检查和预测感兴趣事件发生之前的时间。这种形式的分析起源于医疗保健，重点关注死亡时间。从那时起，Survival Analysis 已成功应用于全球几乎每个行业的用例。
@@ -105,15 +112,15 @@ kmf.fit(T,C)
 
 ### 目视评估群体水平的生存曲线
 如下图所示，生存概率曲线在 x 轴上绘制了时间，在 y 轴上绘制了生存概率。
-![Image](..\assets\post_figure\Pasted image 20250414190509.png)生存概率曲线周围的浅蓝色边框表示置信区间。区间越宽，置信度越低。如下图所示，估计值的置信度随着时间线的增加而降低。虽然这种置信度降低可能是由于数据较少，但同样直观的是，我们对近期预测的信心比对长期预测的信心更大。
+![Image](assets\post_figure\Pasted image 20250414190509.png)生存概率曲线周围的浅蓝色边框表示置信区间。区间越宽，置信度越低。如下图所示，估计值的置信度随着时间线的增加而降低。虽然这种置信度降低可能是由于数据较少，但同样直观的是，我们对近期预测的信心比对长期预测的信心更大。
 ### 在协变量水平评估生存概率
 - 在协变量级别查看 Kaplan-Meier 曲线时，最好看到各组之间存在一定程度的差异，因为这表明可用于预测的差异。
 - 有时生存曲线在预测时会非常接近，例如gender。这就是 log-rank 检验的目的。对数秩的原假设表明这些组在统计上是等效的。当p值大于0.05时，我们不能拒绝两组在统计上相等的假设。
-![Image](..\assets\post_figure\Pasted image 20250414190956.png)
+![Image](assets\post_figure\Pasted image 20250414190956.png)
 - 在统计上相等并不代表没有意义。文中举了促销活动的例子，可以证明这样的发现有助于我们思考促销方针。
 
 下图是onlineSecurity的曲线，一个明显有区别的例子
-![Image](..\assets\post_figure\Pasted image 20250414191004.png)之后文章对于每个变量都绘制了KM曲线并进行对数秩检验。节约空间，就不缀写了。
+![Image](assets\post_figure\Pasted image 20250414191004.png)之后文章对于每个变量都绘制了KM曲线并进行对数秩检验。节约空间，就不缀写了。
 值得一提的是，只有phoneService 和gender的p值大于0.05，故认为这两组变量的影响在统计学上相等的可能性比较明显。其他变量都有把握认为对预测是有意义的。
 
 ### 提取结果
@@ -126,15 +133,15 @@ kmf.fit(T,C)
 ### 模型解释
 - Cox Proportional Hazards用于估计风险比。风险比表示两个个体（或群体）之间存在的风险差异。危险本质上是生存的倒数，或者说失败的概率。
 - Cox 比例风险方程指出风险比是两个项的乘积：基线风险和部分风险。
-- baseline hazard 只是一个 baseline，这是当每个变量都设置为特定值时存在的危险。在这里举了以下几个例子。![Image](..\assets\post_figure\Pasted image 20250414192419.png)
+- baseline hazard 只是一个 baseline，这是当每个变量都设置为特定值时存在的危险。在这里举了以下几个例子。![Image](assets\post_figure\Pasted image 20250414192419.png)
 - 偏风险表示当变量的值与基线不同时发生的风险变化。在任何给定时间，零个或多个变量可以包含与基线不同的值。如下面的方程式所示，由此产生的危险性变化是变量的线性组合。
-![Image](..\assets\post_figure\Pasted image 20250414192436.png)
+![Image](assets\post_figure\Pasted image 20250414192436.png)
 - 如果每个变量都设置为其相应的基线值，则部分风险将等于 1（因为 e^0 = 1），风险比将等于基线风险。
 
 ### The Proportional Hazards Assumption
 Cox Proportional Hazard equation的一个微妙但关键的元素是基线风险是时间 t的函数，而不是参数的函数，而部分风险是参数的函数，而不是时间的函数。这支持了所谓的比例风险假设。比例风险假设指出，在 Cox 比例风险模型的上下文中，两组之间的风险比随时间成比例。这个假设隐含在上面的方程中，因为部分风险中没有 _t_ 意味着部分风险比会改变某个因素，而与时间无关。
 下面给出了成比例和不成比例的例子。
-![Image](..\assets\post_figure\Pasted image 20250414200116.png)
+![Image](assets\post_figure\Pasted image 20250414200116.png)
 
 
 ### One-Hot 编码
@@ -166,7 +173,7 @@ survival_pd = encoded_pd[['churn','tenure','dependents_Yes','internetService_DSL
 ### 评估拟合结果
 考虑三个关键问题：
 - **每个协变量是否具有统计显著性？** 使用0.005作为p值分界，每列都具有显著性
-- **我们对系数估计的置信度如何？** 取了exp的95%上下限，利用box-and-whisker plot可以直观观察。![Image](..\assets\post_figure\Pasted image 20250414200800.png)
+- **我们对系数估计的置信度如何？** 取了exp的95%上下限，利用box-and-whisker plot可以直观观察。![Image](assets\post_figure\Pasted image 20250414200800.png)
 - **每个协变量对风险比有什么影响？** 以 internetService_DSL 为例，如下所示 `coef = -0.22` 和 `exp（coef） = 0.80`。回到 Cox 比例风险方程，这意味着当客户为其互联网服务订阅 DSL 时，其风险率降低了 `0.80` 倍（与基线相比）。
 
 ### 验证模型是否遵循比例风险假设
@@ -185,12 +192,12 @@ survival_pd = encoded_pd[['churn','tenure','dependents_Yes','internetService_DSL
 ```
 #### Schoenfield 残差
 除了运行统计测试之外，利用图形输出来评估情况也很有帮助。这可以使用 Schoenfeld 残差来完成。在下面的输出中，每个变量有两个图。这两个图之间的区别在于残差值的显示顺序： Rank transformed time 和 KM-transformed time。对于我们的模型，这两种类型的图之间没有观察到实质性差异。解释这些图的方法类似于解释线性回归的残差图的方法。换句话说，在查看这种类型的图时，我们不希望在残差中看到任何类型的模式。当不存在模式时，中间的黑线会比较平坦，表示残差与时间无关。
-![Image](..\assets\post_figure\Pasted image 20250414201150.png)![Image](..\assets\post_figure\Pasted image 20250414201156.png)![Image](..\assets\post_figure\Pasted image 20250414201206.png)
-![Image](..\assets\post_figure\Pasted image 20250414201213.png)
+![Image](assets\post_figure\Pasted image 20250414201150.png)![Image](assets\post_figure\Pasted image 20250414201156.png)![Image](assets\post_figure\Pasted image 20250414201206.png)
+![Image](assets\post_figure\Pasted image 20250414201213.png)
 ### ## Log-log Kaplan-Meier Plots
 根据统计检验的结果和 Schoenfeld 残差图，很明显，我们的模型多次违反了比例风险假设。为了从另一个角度了解这里的问题是什么，我们可以使用 log-log Kaplan-Meier 图。顾名思义，该技术在对数尺度上绘制 Kaplan-Meier 曲线。如果未违反比例风险假设，则对数图中的 Kaplan-Meier 曲线将显示为平行.
 
-除了 internetService 之外，在下图中可以看到，当 log（timeline） 在 1 和 3 之间时，Kaplan-Meier 曲线大部分是平行的，但当 log（timeline） 小于 1 或大于 3 时，Kaplan-Meier 曲线是平行的。![Image](..\assets\post_figure\Pasted image 20250414201532.png)![Image](..\assets\post_figure\Pasted image 20250414201537.png)![Image](..\assets\post_figure\Pasted image 20250414201540.png)![Image](..\assets\post_figure\Pasted image 20250414201544.png)
+除了 internetService 之外，在下图中可以看到，当 log（timeline） 在 1 和 3 之间时，Kaplan-Meier 曲线大部分是平行的，但当 log（timeline） 小于 1 或大于 3 时，Kaplan-Meier 曲线是平行的。![Image](assets\post_figure\Pasted image 20250414201532.png)![Image](assets\post_figure\Pasted image 20250414201537.png)![Image](assets\post_figure\Pasted image 20250414201540.png)![Image](assets\post_figure\Pasted image 20250414201544.png)
 
 ## 04 Accelerated Failure Time
 在这个部分，主要是对 Log-Logistic Accelerated Failure Time 模型进行学习。
@@ -200,7 +207,7 @@ survival_pd = encoded_pd[['churn','tenure','dependents_Yes','internetService_DSL
 
 ### 基本假设
 下面为AFT模型的方程，其中AB两组为不同的对象。而lambda尤其值得注意，它在实践当中往往是多个参数。例如log-logistic accelerated failure time is: $1/(1+\lambda \times t^ p)$.
-![Image](..\assets\post_figure\Pasted image 20250414202838.png)
+![Image](assets\post_figure\Pasted image 20250414202838.png)
 
 ### one-hot 编码和环境配置
 这里和03部分相似，不赘述
@@ -211,13 +218,13 @@ survival_pd = encoded_pd[['churn','tenure','dependents_Yes','internetService_DSL
 ### 评估结果
 同样是三个关键问题
 - 每个协变量是否具有统计显著性？ **  可以看到每列的 p 值低于 < 0.005。因此，每列都具有统计显著性，可以安全地包含。
-- **我们对系数估计的置信度如何？** ![Image](..\assets\post_figure\Pasted image 20250414203450.png)
+- **我们对系数估计的置信度如何？** ![Image](assets\post_figure\Pasted image 20250414203450.png)
 - **每个协变量对风险比有什么影响？** 以 internetService_DSL 为例，如 `coef = 0.38` 和 `exp（coef） = 1.47`。回到加速故障时间方程式，这意味着当客户将光纤作为其互联网服务时，客户的 it-until-churn 时间会加速 1.47 倍。请注意，Fiber Optic 是基线值，对应于上面共享的方程式中的 A 组。 
 
 ### 验证假设
 
 这里给出了不同变量的结果，下图为partner的，作为例子。分析结果如下。
-![Image](..\assets\post_figure\Pasted image 20250414203651.png)
+![Image](assets\post_figure\Pasted image 20250414203651.png)
 使用加速失效时间模型时，有两个基本假设需要评估：
 - 该模型是否遵循比例赔率假设？ 当图中的行平行时，答案是肯定的。
 - 指定的分布是否适合此模型？ 当线条是直的时，答案是肯定的。
@@ -290,4 +297,4 @@ survival_pd = encoded_pd[['churn','tenure','dependents_Yes','internetService_DSL
     - **累计 NPV 图表**：展示不同合约期（例如 12、24、36 个月）下，累计净现值的分布情况，直观呈现客户获取成本和回收期；
         
     - **生存概率曲线图**：绘制整个合约期内的客户生存概率曲线，辅助判断客户流失风险及 CLV 的变化趋势。
-![Image](..\assets\post_figure\Pasted image 20250414204030.png)
+![Image](assets\post_figure\Pasted image 20250414204030.png)

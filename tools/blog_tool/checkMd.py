@@ -16,9 +16,7 @@ def replace_image_paths_in_md(file_path):
 
     # Replace all matches of the pattern
     # Use raw string (r'') for the path to avoid unicodeescape errors
-    modified_content = re.sub(
-        pattern, r"![Image](..\\assets\\post_figure\\\1)", content
-    )
+    modified_content = re.sub(pattern, r"![Image](assets\\post_figure\\\1)", content)
 
     # Save the modified content back to the file
     with open(file_path, "w", encoding="utf-8") as file:
