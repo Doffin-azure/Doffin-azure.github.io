@@ -5,24 +5,30 @@ import re
 def replace_image_paths_in_md(file_path):
     """
     This function reads a markdown file, finds all instances of ![[xxx]]
-    and replaces them with ![Image](..\\assets\\post_figure\\xxx)
+    and replaces them with ![Image](assets/post_figure/xxx)
     """
     # Define the regex pattern to match ![[xxx]]
     pattern = r"!\[\[(.*?)\]\]"
 
-    # Open the file and read the content
-    with open(file_path, "r", encoding="utf-8") as file:
-        content = file.read()
+    try:
+        # Open the file and read the content
+        with open(file_path, "r", encoding="utf-8") as file:
+            content = file.read()
 
-    # Replace all matches of the pattern
-    # Use raw string (r'') for the path to avoid unicodeescape errors
-    modified_content = re.sub(pattern, r"![Image](assets\\post_figure\\\1)", content)
+        # Replace all matches of the pattern
+        # Correcting the image path format to use forward slashes and proper folder structure
+        modified_content = re.sub(pattern, r"![Image](assets/post_figure/\1)", content)
 
-    # Save the modified content back to the file
-    with open(file_path, "w", encoding="utf-8") as file:
-        file.write(modified_content)
+        # Save the modified content back to the file
+        with open(file_path, "w", encoding="utf-8") as file:
+            file.write(modified_content)
 
-    print(f"File '{file_path}' updated successfully!")
+        print(f"File '{file_path}' updated successfully!")
+
+    except FileNotFoundError:
+        print(f"File '{file_path}' not found.")
+    except IOError as e:
+        print(f"Error reading or writing the file '{file_path}': {e}")
 
 
 def update_all_md_files_in_directory(directory):
